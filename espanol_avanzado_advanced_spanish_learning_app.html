@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Español Avanzado - Advanced Spanish Practice</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --accent: #38bdf8;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --text: #f8fafc;
+      --subtext: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Custom Input Focus and Success States */
+    .input-field {
+      border: 2px solid transparent;
+      transition: all 0.2s ease;
+    }
+    .input-field:focus {
+      border-color: var(--accent);
+      outline: none;
+    }
+    .input-field.correct {
+      border-color: var(--success);
+      background-color: rgba(34, 197, 94, 0.12);
+    }
+
+    .accent-btn {
+      transition: transform 0.1s ease, background-color 0.15s ease;
+    }
+    .accent-btn:active {
+      transform: scale(0.92);
+    }
+
+    /* Custom Scrollbar for Session Log */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #1e293b;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body class="flex flex-col items-center justify-between p-4 md:p-6 min-h-screen">
+
+  <!-- Main Container -->
+  <div class="w-full max-w-lg mx-auto flex flex-col gap-4 my-auto">
+    
+    <!-- Header Controls & Category Selector -->
+    <div class="flex flex-col gap-3">
+      <div class="flex items-center justify-between text-xs sm:text-sm text-slate-400">
+        <div class="flex items-center gap-2">
+          <span id="phase-badge" class="px-2.5 py-1 rounded-full bg-sky-500/20 text-sky-400 font-semibold text-xs border border-sky-500/30">
+            Phase 1: Word by Word
+          </span>
+          <span id="grammar-rule-tag" class="px-2 py-0.5 rounded-md bg-purple-500/20 text-purple-300 font-medium text-xs border border-purple-500/30 hidden sm:inline-block">
+            Subjunctive
+          </span>
+        </div>
+        <div class="flex items-center gap-3 font-medium">
+          <span title="Streak Count"><i class="fa-solid fa-fire text-amber-500 mr-1"></i><span id="streak-counter">0</span></span>
+          <span title="Session Accuracy"><i class="fa-solid fa-bullseye text-emerald-500 mr-1"></i><span id="accuracy-counter">100%</span></span>
+        </div>
+      </div>
+
+      <!-- Category Picker & Settings Toolbar -->
+      <div class="flex items-center gap-2 bg-slate-800/80 p-1.5 rounded-xl border border-slate-700/60">
+        <select id="category-select" onchange="onCategoryChange()" class="bg-slate-900 text-slate-200 text-xs sm:text-sm rounded-lg px-2.5 py-1.5 outline-none border border-slate-700 flex-1 cursor-pointer">
+          <option value="all">🌟 All Categories Mixed</option>
+          <option value="subjunctive">🎯 Subjunctive Mood & Triggers</option>
+          <option value="conditionals">⚡ Conditional & Imperfect Subjunctive</option>
+          <option value="business">📦 Business & Produce Logistics</option>
+          <option value="connectors">🔗 Advanced Discourse Connectors</option>
+        </select>
+
+        <button onclick="toggleSettingsModal()" class="p-2 bg-slate-700/60 hover:bg-slate-700 text-slate-300 rounded-lg text-xs flex items-center justify-center transition-colors" title="Settings & Options">
+          <i class="fa-solid fa-gear"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Active Sentence Display -->
+    <div id="sentence-display" class="w-full bg-slate-800/90 p-4 rounded-2xl min-h-[72px] flex items-center justify-center text-center text-sky-400 font-medium text-base sm:text-lg border border-slate-700/50 shadow-inner leading-snug">
+      <em>Type the word below to start...</em>
+    </div>
+
+    <!-- Interactive Card -->
+    <div id="word-card" class="w-full bg-slate-800 p-5 rounded-2xl text-center shadow-xl border border-slate-700/60 flex flex-col items-center gap-3">
+      <!-- Grammar Insight Banner -->
+      <div id="grammar-explanation" class="text-xs text-indigo-300 bg-indigo-950/60 border border-indigo-800/50 px-3 py-1 rounded-lg w-full text-center">
+        Grammar Insight: Present Subjunctive (Doubt/Desire)
+      </div>
+
+      <div id="es-word" class="text-2xl sm:text-3xl font-extrabold text-slate-100 leading-tight tracking-tight mt-1">---</div>
+      <div id="en-word" class="text-sm sm:text-base text-slate-400 font-normal leading-snug">---</div>
+
+      <!-- Audio Action Bar -->
+      <div class="flex items-center gap-2 mt-1">
+        <button id="audio-btn" onclick="speakCurrent()" class="bg-sky-500/15 hover:bg-sky-500/25 active:scale-95 text-sky-400 px-4 py-1.5 rounded-full text-xs sm:text-sm font-semibold border border-sky-500/20 flex items-center gap-2 transition-all">
+          <i class="fa-solid fa-volume-high"></i> Listen
+        </button>
+        <button id="slow-audio-btn" onclick="speakCurrent(true)" class="bg-amber-500/15 hover:bg-amber-500/25 active:scale-95 text-amber-400 px-3 py-1.5 rounded-full text-xs sm:text-sm font-semibold border border-amber-500/20 flex items-center gap-1.5 transition-all" title="Listen at 0.5x speed">
+          <i class="fa-solid fa-turtle"></i> 0.5x
+        </button>
+      </div>
+    </div>
+
+    <!-- Accent Key Helper Buttons -->
+    <div class="flex items-center justify-center gap-1.5 sm:gap-2 w-full px-1">
+      <button onclick="insertAccent('á')" class="accent-btn bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded-lg text-sm sm:text-base font-semibold py-1.5 px-2.5 flex-1 shadow-sm">á</button>
+      <button onclick="insertAccent('é')" class="accent-btn bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded-lg text-sm sm:text-base font-semibold py-1.5 px-2.5 flex-1 shadow-sm">é</button>
+      <button onclick="insertAccent('í')" class="accent-btn bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded-lg text-sm sm:text-base font-semibold py-1.5 px-2.5 flex-1 shadow-sm">í</button>
+      <button onclick="insertAccent('ó')" class="accent-btn bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded-lg text-sm sm:text-base font-semibold py-1.5 px-2.5 flex-1 shadow-sm">ó</button>
+      <button onclick="insertAccent('ú')" class="accent-btn bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700 rounded-lg text-sm sm:text-base font-semibold py-1.5 px-2.5 flex-1 shadow-sm">ú</button>
+      <button onclick="insertAccent('ñ')" class="accent-btn bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 rounded-lg text-sm sm:text-base font-semibold py-1.5 px-2.5 flex-1 shadow-sm">ñ</button>
+      <button onclick="insertAccent('¿')" class="accent-btn bg-slate-800 hover:bg-slate-700 text-purple-300 border border-slate-700 rounded-lg text-sm sm:text-base font-semibold py-1.5 px-2.5 flex-1 shadow-sm">¿</button>
+      <button onclick="insertAccent('¡')" class="accent-btn bg-slate-800 hover:bg-slate-700 text-purple-300 border border-slate-700 rounded-lg text-sm sm:text-base font-semibold py-1.5 px-2.5 flex-1 shadow-sm">¡</button>
+    </div>
+
+    <!-- Text Input Box -->
+    <div class="relative w-full">
+      <input type="text" id="user-input" placeholder="Type in Spanish..." autocomplete="off" autocapitalize="none" spellcheck="false" class="input-field w-full p-4 text-center text-lg sm:text-xl font-medium rounded-2xl bg-slate-800 text-slate-100 shadow-md">
+    </div>
+
+    <!-- Completion Screen (Shown when phrase is mastered) -->
+    <div id="completion-screen" class="hidden w-full bg-slate-800 p-6 rounded-2xl border border-emerald-500/30 text-center flex-col items-center gap-4 shadow-2xl">
+      <div class="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-2xl mx-auto border border-emerald-500/40">
+        <i class="fa-solid fa-check"></i>
+      </div>
+      <div>
+        <h2 class="text-2xl font-bold text-emerald-400">Mastered!</h2>
+        <p class="text-xs text-slate-400 mt-0.5">Complete sentence mastered</p>
+      </div>
+
+      <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-700/60 w-full text-left flex flex-col gap-1.5">
+        <p id="final-spanish" class="text-base sm:text-lg font-semibold text-sky-300 leading-snug"></p>
+        <p id="final-english" class="text-xs sm:text-sm text-slate-400 italic"></p>
+      </div>
+
+      <button onclick="generateNewSentence()" class="w-full bg-sky-500 hover:bg-sky-400 active:scale-95 text-slate-950 py-3.5 px-6 font-bold text-base rounded-xl transition-all shadow-lg flex items-center justify-center gap-2">
+        Next Advanced Sentence <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </div>
+
+    <!-- Recent History Log Toggle -->
+    <div class="w-full bg-slate-800/40 rounded-xl border border-slate-800 p-3">
+      <button onclick="toggleHistoryLog()" class="w-full flex items-center justify-between text-xs text-slate-400 hover:text-slate-200 transition-colors">
+        <span><i class="fa-solid fa-clock-rotate-left mr-1.5"></i> Practice History (<span id="history-count">0</span>)</span>
+        <i id="history-chevron" class="fa-solid fa-chevron-down"></i>
+      </button>
+      <div id="history-list" class="hidden mt-3 space-y-2 max-h-36 overflow-y-auto pr-1 text-xs">
+        <p class="text-slate-500 italic text-center py-2" id="history-empty">No sentences completed yet in this session.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Audio & Settings Modal -->
+  <div id="settings-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-sm p-5 flex flex-col gap-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+        <h3 class="font-bold text-slate-100 text-base"><i class="fa-solid fa-sliders text-sky-400 mr-2"></i> Settings & Audio</h3>
+        <button onclick="toggleSettingsModal()" class="text-slate-400 hover:text-slate-200"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
+      <div class="flex flex-col gap-3 text-xs sm:text-sm">
+        <div>
+          <label class="text-slate-400 font-medium block mb-1">Target Accent / Regional Voice</label>
+          <select id="voice-lang-select" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-slate-200 outline-none">
+            <option value="es-MX">Spanish (Mexico - es-MX)</option>
+            <option value="es-ES">Spanish (Spain - es-ES)</option>
+            <option value="es-US">Spanish (US - es-US)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="text-slate-400 font-medium block mb-1">Standard Speech Speed</label>
+          <input type="range" id="speech-rate" min="0.5" max="1.0" step="0.05" value="0.82" class="w-full accent-sky-400 cursor-pointer">
+          <div class="flex justify-between text-xs text-slate-500 mt-1">
+            <span>0.5x (Slow)</span>
+            <span id="rate-val">0.82x</span>
+            <span>1.0x (Normal)</span>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between pt-2 border-t border-slate-700/60">
+          <span class="text-slate-300 font-medium">Show English Prompts</span>
+          <input type="checkbox" id="show-translation-toggle" checked onchange="toggleTranslationVisibility()" class="w-4 h-4 accent-sky-500 rounded cursor-pointer">
+        </div>
+      </div>
+
+      <button onclick="toggleSettingsModal()" class="w-full bg-slate-700 hover:bg-slate-600 text-slate-100 font-semibold py-2 rounded-lg text-xs mt-1 transition-colors">
+        Close
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Expanded Database of Advanced Grammar & Professional/Produce Vocab
+    const DB = {
+      // Subjunctive Triggers & Complex Sentences
+      subjunctive: {
+        rule: "Subjunctive Mood (Doubt, Expectation, Emotion)",
+        triggers: [
+          { es: "Ojalá que", en: "I hope that" },
+          { es: "Es imprescindible que", en: "It is essential that" },
+          { es: "Dudo que", en: "I doubt that" },
+          { es: "No creo que", en: "I don't think that" },
+          { es: "Es probable que", en: "It is likely that" },
+          { es: "Es importante que", en: "It is important that" },
+          { es: "Es una lástima que", en: "It is a pity that" },
+          { es: "Tan pronto como", en: "As soon as" }
+        ],
+        actions: [
+          { es: "el gobierno implemente", en: "the government implements" },
+          { es: "nosotros logremos", en: "we achieve" },
+          { es: "ella comprenda", en: "she understands" },
+          { es: "ellos resuelvan", en: "they solve" },
+          { es: "la empresa desarrolle", en: "the company develops" },
+          { es: "tú encuentres", en: "you find" },
+          { es: "los científicos descubran", en: "scientists discover" }
+        ],
+        complements: [
+          { es: "una solución sostenible", en: "a sustainable solution" },
+          { es: "las consecuencias económicas", en: "the economic consequences" },
+          { es: "el verdadero significado", en: "the true meaning" },
+          { es: "un impacto significativo", en: "a significant impact" },
+          { es: "la complejidad del problema", en: "the complexity of the problem" },
+          { es: "nuevas oportunidades laborales", en: "new job opportunities" }
+        ]
+      },
+
+      // Conditional & Imperfect Subjunctive (Si tuviera... habría...)
+      conditionals: {
+        rule: "Hypothetical Conditional (Imperfect Subjunctive + Conditional)",
+        clauses: [
+          { es: "Si tuviera más tiempo", en: "If I had more time" },
+          { es: "Si supieras la verdad", en: "If you knew the truth" },
+          { es: "Si pudiéramos cambiar las cosas", en: "If we could change things" },
+          { es: "Si hubiéramos llegado antes", en: "If we had arrived earlier" },
+          { es: "Si la inversión fuera mayor", en: "If the investment were greater" }
+        ],
+        results: [
+          { es: "viajaría por todo el mundo", en: "I would travel around the world" },
+          { es: "tomarías una decisión diferente", en: "you would make a different decision" },
+          { es: "evitaríamos este malentendido", en: "we would avoid this misunderstanding" },
+          { es: "habríamos visto el espectáculo", en: "we would have seen the show" },
+          { es: "obtendríamos mejores resultados", en: "we would obtain better results" }
+        ]
+      },
+
+      // Professional, Business & Produce/Agriculture Supply Chain
+      business: {
+        rule: "Business & Produce Logistics Terminology",
+        prefixes: [
+          { es: "Para optimizar", en: "In order to optimize" },
+          { es: "Debido a fallas en", en: "Due to failures in" },
+          { es: "Con el fin de garantizar", en: "To guarantee" },
+          { es: "Tras evaluar", en: "After evaluating" }
+        ],
+        subjects: [
+          { es: "la cadena de suministro", en: "the supply chain" },
+          { es: "la inspección de calidad", en: "the quality inspection" },
+          { es: "el rendimiento de la cosecha", en: "the harvest yield" },
+          { es: "la logística de distribución", en: "distribution logistics" },
+          { es: "el control de temperatura", en: "temperature control" }
+        ],
+        outcomes: [
+          { es: "reduciremos los costos operativos", en: "we will reduce operational costs" },
+          { es: "evitaremos el deterioro del producto", en: "we will prevent product spoilage" },
+          { es: "aumentaremos la eficiencia de envío", en: "we will increase shipping efficiency" },
+          { es: "cumpliremos con las normas internacionales", en: "we will comply with international standards" }
+        ]
+      },
+
+      // Advanced Discourse Connectors
+      connectors: {
+        rule: "Advanced Discourse Connectors & Rhetoric",
+        leadIns: [
+          { es: "A pesar de que", en: "Despite the fact that" },
+          { es: "Por lo tanto,", en: "Therefore," },
+          { es: "Sin embargo,", en: "However," },
+          { es: "En cuanto a", en: "Regarding" },
+          { es: "No obstante,", en: "Nevertheless," }
+        ],
+        statements: [
+          { es: "el análisis demuestra que", en: "the analysis shows that" },
+          { es: "la situación ha cambiado y", en: "the situation has changed and" },
+          { es: "los resultados son prometedores pues", en: "the results are promising since" },
+          { es: "los expertos recomiendan precaución porque", en: "experts recommend caution because" }
+        ],
+        conclusions: [
+          { es: "debemos actuar de inmediato", en: "we must act immediately" },
+          { es: "requiere un enfoque cauteloso", en: "requires a cautious approach" },
+          { es: "abre nuevas posibilidades", en: "opens up new possibilities" },
+          { es: "exige mayor responsabilidad", en: "demands greater responsibility" }
+        ]
+      }
+    };
+
+    function rand(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    // State Variables
+    let currentSentence = { spanishTokens: [], englishTokens: [], fullSpanish: "", fullEnglish: "", rule: "" };
+    let currentWordIdx = 0;
+    let builtSentence = [];
+    let completedCount = 0;
+    let totalAttempts = 0;
+    let correctFirstTry = 0;
+    let isFullSentencePhase = false;
+    let historySession = [];
+    let showEnglishPrompts = true;
+
+    // DOM References
+    const esWordEl = document.getElementById('es-word');
+    const enWordEl = document.getElementById('en-word');
+    const inputEl = document.getElementById('user-input');
+    const sentenceDisplayEl = document.getElementById('sentence-display');
+    const wordCardEl = document.getElementById('word-card');
+    const completionScreenEl = document.getElementById('completion-screen');
+    const finalSpanishEl = document.getElementById('final-spanish');
+    const finalEnglishEl = document.getElementById('final-english');
+    const streakCounterEl = document.getElementById('streak-counter');
+    const accuracyCounterEl = document.getElementById('accuracy-counter');
+    const phaseBadgeEl = document.getElementById('phase-badge');
+    const grammarRuleTagEl = document.getElementById('grammar-rule-tag');
+    const grammarExplanationEl = document.getElementById('grammar-explanation');
+    const categorySelectEl = document.getElementById('category-select');
+    const speechRateEl = document.getElementById('speech-rate');
+
+    speechRateEl.addEventListener('input', (e) => {
+      document.getElementById('rate-val').textContent = `${e.target.value}x`;
+    });
+
+    function buildRandomSentence() {
+      const selectedCategory = categorySelectEl.value;
+      let cat = selectedCategory;
+
+      if (cat === 'all') {
+        const categories = ['subjunctive', 'conditionals', 'business', 'connectors'];
+        cat = categories[Math.floor(Math.random() * categories.length)];
+      }
+
+      let parts = [];
+      let rule = DB[cat].rule;
+
+      if (cat === 'subjunctive') {
+        parts = [rand(DB.subjunctive.triggers), rand(DB.subjunctive.actions), rand(DB.subjunctive.complements)];
+      } else if (cat === 'conditionals') {
+        parts = [rand(DB.conditionals.clauses), rand(DB.conditionals.results)];
+      } else if (cat === 'business') {
+        parts = [rand(DB.business.prefixes), rand(DB.business.subjects), rand(DB.business.outcomes)];
+      } else if (cat === 'connectors') {
+        parts = [rand(DB.connectors.leadIns), rand(DB.connectors.statements), rand(DB.connectors.conclusions)];
+      }
+
+      const spanishTokens = [];
+      const englishTokens = [];
+
+      parts.forEach(part => {
+        const esWords = part.es.split(" ");
+        esWords.forEach((word, idx) => {
+          spanishTokens.push(word);
+          englishTokens.push(idx === 0 ? part.en : "");
+        });
+      });
+
+      const fullSpanish = parts.map(p => p.es).join(" ");
+      const fullEnglish = parts.map(p => p.en).join(" ");
+
+      return { spanishTokens, englishTokens, fullSpanish, fullEnglish, rule };
+    }
+
+    function speakText(text, isSlow = false) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        
+        const voiceLang = document.getElementById('voice-lang-select').value || 'es-MX';
+        utterance.lang = voiceLang;
+        
+        const baseRate = parseFloat(speechRateEl.value) || 0.82;
+        utterance.rate = isSlow ? 0.5 : baseRate;
+
+        // Try to select native Spanish voice matching language selection
+        const voices = window.speechSynthesis.getVoices();
+        const matchingVoice = voices.find(v => v.lang.replace('_','-') === voiceLang);
+        if (matchingVoice) {
+          utterance.voice = matchingVoice;
+        }
+
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    function speakCurrent(isSlow = false) {
+      if (!isFullSentencePhase) {
+        if (currentWordIdx < currentSentence.spanishTokens.length) {
+          speakText(currentSentence.spanishTokens[currentWordIdx], isSlow);
+        }
+      } else {
+        speakText(currentSentence.fullSpanish, isSlow);
+      }
+    }
+
+    function updateCard() {
+      if (!isFullSentencePhase) {
+        // Phase 1: Word-by-Word
+        if (currentWordIdx < currentSentence.spanishTokens.length) {
+          esWordEl.textContent = currentSentence.spanishTokens[currentWordIdx];
+          
+          if (showEnglishPrompts) {
+            enWordEl.textContent = currentSentence.englishTokens[currentWordIdx] || '';
+            enWordEl.style.display = 'block';
+          } else {
+            enWordEl.style.display = 'none';
+          }
+
+          inputEl.value = '';
+          inputEl.classList.remove('correct');
+          speakCurrent();
+        } else {
+          // Transition to Phase 2: Full Sentence Phase
+          startFullSentencePhase();
+        }
+      } else {
+        // Phase 2: Complete Sentence Typing
+        const targetClean = cleanText(currentSentence.fullSpanish);
+        const userClean = cleanText(inputEl.value);
+
+        if (userClean === targetClean) {
+          inputEl.classList.add('correct');
+          
+          setTimeout(() => {
+            completedCount++;
+            streakCounterEl.textContent = completedCount;
+            
+            // Add sentence to session history log
+            addHistoryItem(currentSentence.fullSpanish, currentSentence.fullEnglish);
+
+            wordCardEl.classList.add('hidden');
+            inputEl.classList.add('hidden');
+            completionScreenEl.classList.remove('hidden');
+            completionScreenEl.classList.add('flex');
+            
+            finalSpanishEl.textContent = currentSentence.fullSpanish;
+            finalEnglishEl.textContent = `"${currentSentence.fullEnglish}"`;
+            
+            speakText(currentSentence.fullSpanish);
+          }, 350);
+        }
+      }
+    }
+
+    function startFullSentencePhase() {
+      isFullSentencePhase = true;
+      phaseBadgeEl.textContent = "Phase 2: Complete Sentence";
+      phaseBadgeEl.className = "px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-400 font-semibold text-xs border border-amber-500/30";
+
+      sentenceDisplayEl.innerHTML = `<span class="italic text-slate-300">Type the entire sentence in Spanish:</span>`;
+      esWordEl.textContent = currentSentence.fullSpanish;
+      
+      if (showEnglishPrompts) {
+        enWordEl.textContent = `"${currentSentence.fullEnglish}"`;
+        enWordEl.style.display = 'block';
+      } else {
+        enWordEl.style.display = 'none';
+      }
+      
+      inputEl.value = '';
+      inputEl.placeholder = "Type full sentence here...";
+      inputEl.classList.remove('correct');
+      
+      speakText(currentSentence.fullSpanish);
+    }
+
+    function cleanText(str) {
+      return str.toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^\w]/g, "");
+    }
+
+    inputEl.addEventListener('input', (e) => {
+      totalAttempts++;
+      if (!isFullSentencePhase) {
+        const targetWord = currentSentence.spanishTokens[currentWordIdx];
+        if (cleanText(e.target.value) === cleanText(targetWord)) {
+          inputEl.classList.add('correct');
+          builtSentence.push(targetWord);
+          sentenceDisplayEl.textContent = builtSentence.join(' ');
+
+          setTimeout(() => {
+            currentWordIdx++;
+            updateCard();
+          }, 250);
+        }
+      } else {
+        updateCard();
+      }
+      updateAccuracy();
+    });
+
+    function updateAccuracy() {
+      if (totalAttempts === 0) return;
+      // Rough accuracy estimate based on active progress
+      const acc = Math.min(100, Math.round(((completedCount * 12 + builtSentence.length) / (totalAttempts + 1)) * 100));
+      accuracyCounterEl.textContent = `${Math.max(70, acc)}%`;
+    }
+
+    function insertAccent(char) {
+      inputEl.value += char;
+      inputEl.focus();
+      // Trigger input event manually so full sentence checks update
+      inputEl.dispatchEvent(new Event('input'));
+    }
+
+    function onCategoryChange() {
+      generateNewSentence();
+    }
+
+    function generateNewSentence() {
+      currentSentence = buildRandomSentence();
+      currentWordIdx = 0;
+      builtSentence = [];
+      isFullSentencePhase = false;
+
+      phaseBadgeEl.textContent = "Phase 1: Word by Word";
+      phaseBadgeEl.className = "px-2.5 py-1 rounded-full bg-sky-500/20 text-sky-400 font-semibold text-xs border border-sky-500/30";
+      
+      grammarRuleTagEl.textContent = currentSentence.rule.split(" ")[0];
+      grammarExplanationEl.textContent = `Grammar Insight: ${currentSentence.rule}`;
+
+      sentenceDisplayEl.innerHTML = '<em>Type the word below to start...</em>';
+      inputEl.placeholder = "Type in Spanish...";
+      wordCardEl.classList.remove('hidden');
+      inputEl.classList.remove('hidden');
+      completionScreenEl.classList.add('hidden');
+      completionScreenEl.classList.remove('flex');
+
+      updateCard();
+    }
+
+    function toggleSettingsModal() {
+      const modal = document.getElementById('settings-modal');
+      modal.classList.toggle('hidden');
+    }
+
+    function toggleTranslationVisibility() {
+      showEnglishPrompts = document.getElementById('show-translation-toggle').checked;
+      updateCard();
+    }
+
+    function toggleHistoryLog() {
+      const list = document.getElementById('history-list');
+      const chevron = document.getElementById('history-chevron');
+      list.classList.toggle('hidden');
+      chevron.classList.toggle('fa-chevron-up');
+      chevron.classList.toggle('fa-chevron-down');
+    }
+
+    function addHistoryItem(es, en) {
+      historySession.push({ es, en });
+      document.getElementById('history-count').textContent = historySession.length;
+      document.getElementById('history-empty').style.display = 'none';
+
+      const list = document.getElementById('history-list');
+      const item = document.createElement('div');
+      item.className = 'p-2 bg-slate-800/90 rounded-lg border border-slate-700/50 text-left';
+      item.innerHTML = `
+        <p class="font-medium text-sky-300 text-xs">${es}</p>
+        <p class="text-[11px] text-slate-400 italic">${en}</p>
+      `;
+      list.prepend(item);
+    }
+
+    // Auto load synthesis voices on chrome/modern browsers
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.getVoices();
+      };
+    }
+
+    // Initial Start
+    document.body.addEventListener('click', function initAudio() {
+      speakCurrent();
+      document.body.removeEventListener('click', initAudio);
+    }, { once: true });
+
+    generateNewSentence();
+  </script>
+</body>
+</html>
