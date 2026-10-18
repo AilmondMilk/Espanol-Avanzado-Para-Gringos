@@ -13,6 +13,9 @@
       --accent: #38bdf8;
       --success: #22c55e;
       --warning: #f59e0b;
+      --error: #ef4444;
+      --trigger-color: #a855f7;
+      --verb-color: #10b981;
       --text: #f8fafc;
       --subtext: #94a3b8;
       --border: rgba(255, 255, 255, 0.08);
@@ -37,7 +40,7 @@
 
     .container {
       width: 100%;
-      max-width: 440px;
+      max-width: 460px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -92,9 +95,9 @@
     .grammar-pill {
       background: rgba(245, 158, 11, 0.15);
       color: var(--warning);
-      padding: 4px 10px;
+      padding: 6px 12px;
       border-radius: 12px;
-      font-size: 0.78rem;
+      font-size: 0.8rem;
       font-weight: 600;
       text-align: center;
       width: 100%;
@@ -106,16 +109,18 @@
       background: var(--card-bg);
       padding: 16px;
       border-radius: 16px;
-      min-height: 65px;
+      min-height: 70px;
       display: flex;
       align-items: center;
       justify-content: center;
       text-align: center;
-      font-size: 1.05rem;
-      color: var(--accent);
+      font-size: 1.1rem;
+      color: var(--text);
       font-weight: 500;
       border: 1px solid var(--border);
-      line-height: 1.4;
+      line-height: 1.6;
+      flex-wrap: wrap;
+      gap: 4px;
     }
 
     .card {
@@ -132,12 +137,67 @@
       border: 1px solid var(--border);
     }
 
+    .spanish-word-container {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
     .spanish-word {
       font-size: 1.8rem;
       font-weight: 800;
       letter-spacing: -0.5px;
       color: var(--text);
       line-height: 1.25;
+    }
+
+    .hl-trigger {
+      border-bottom: 2px dashed var(--trigger-color);
+      color: #c084fc;
+      cursor: help;
+      position: relative;
+    }
+
+    .hl-verb {
+      border-bottom: 2px solid var(--verb-color);
+      color: #34d399;
+      cursor: pointer;
+      position: relative;
+    }
+
+    /* Target Typo Straight Underline Style */
+    .typo-word {
+      text-decoration: underline solid var(--error);
+      text-underline-offset: 4px;
+      color: #fca5a5;
+    }
+
+    .tooltip {
+      visibility: hidden;
+      opacity: 0;
+      background-color: #020617;
+      color: #f8fafc;
+      text-align: center;
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--accent);
+      font-size: 0.8rem;
+      font-weight: 500;
+      position: absolute;
+      z-index: 10;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      transition: opacity 0.2s, visibility 0.2s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+
+    .hl-trigger:hover .tooltip,
+    .hl-verb:hover .tooltip {
+      visibility: visible;
+      opacity: 1;
     }
 
     .english-word {
@@ -157,4 +217,832 @@
       background: rgba(56, 189, 248, 0.15);
       border: 1px solid rgba(56, 189, 248, 0.3);
       color: var(--accent);
-      padding:
+      padding: 6px 14px;
+      border-radius: 16px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .accent-bar {
+      display: flex;
+      gap: 6px;
+      width: 100%;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .accent-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      flex: 1;
+      max-width: 42px;
+      text-align: center;
+    }
+
+    .accent-btn:active {
+      background: var(--accent);
+      color: #000;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 14px;
+      font-size: 1.15rem;
+      border-radius: 16px;
+      border: 2px solid transparent;
+      background: var(--card-bg);
+      color: var(--text);
+      text-align: center;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    input[type="text"]:focus {
+      border-color: var(--accent);
+    }
+
+    input[type="text"].correct {
+      border-color: var(--success);
+      background: rgba(34, 197, 94, 0.1);
+    }
+
+    /* Red Input Box Highlight */
+    input[type="text"].typo-highlight {
+      border-color: var(--error) !important;
+      background: rgba(239, 68, 68, 0.12) !important;
+    }
+
+    .completion-screen {
+      display: none;
+      text-align: center;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .completion-screen h2 {
+      font-size: 1.8rem;
+      color: var(--success);
+      margin: 0;
+    }
+
+    .next-btn {
+      background: var(--accent);
+      color: #000;
+      border: none;
+      padding: 16px 32px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      border-radius: 16px;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .key-hint {
+      font-size: 0.85rem;
+      color: var(--subtext);
+      margin-top: -6px;
+    }
+
+    .legend {
+      display: flex;
+      gap: 12px;
+      font-size: 0.75rem;
+      color: var(--subtext);
+      margin-top: 2px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .dot-trigger {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--trigger-color);
+    }
+
+    .dot-verb {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--verb-color);
+    }
+
+    .history-section {
+      width: 100%;
+      background: var(--card-bg);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      padding: 12px 16px;
+      margin-top: 10px;
+    }
+
+    .history-header {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--subtext);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 10px;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+
+    .history-item {
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 10px;
+      padding: 10px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+
+    .history-item-en {
+      font-size: 0.85rem;
+      color: var(--subtext);
+      margin-top: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header">
+      <h1>Español Avanzado – Para Gringos</h1>
+    </div>
+
+    <!-- Tense Selector -->
+    <select class="category-select" id="category-select" onchange="changeCategory()">
+      <option value="all">🌟 All 12 Tenses (Infinite Generator)</option>
+      <option value="present">1️⃣ Present Tense (Presente)</option>
+      <option value="future">2️⃣ Future Tense (Futuro Simple)</option>
+      <option value="command">3️⃣ Imperative Mood (Mandatos / Commands)</option>
+      <option value="presentPerfect">4️⃣ Present Perfect (Pretérito Perfecto)</option>
+      <option value="presentSubjunctive">5️⃣ Present Subjunctive (Presente de Subjuntivo)</option>
+      <option value="presentPerfectSubjunctive">6️⃣ Present Perfect Subjunctive (Pretérito Perfecto de Subjuntivo)</option>
+      <option value="preterite">7️⃣ Preterite Tense (Pretérito Indefinido)</option>
+      <option value="imperfect">8️⃣ Imperfect Tense (Pretérito Imperfecto)</option>
+      <option value="conditional">9️⃣ Conditional Tense (Condicional Simple)</option>
+      <option value="pastPerfect">🔟 Past Perfect / Pluperfect (Pluscuamperfecto)</option>
+      <option value="imperfectSubjunctive">1️⃣1️⃣ Imperfect Subjunctive (Imperfecto de Subjuntivo)</option>
+      <option value="pastPerfectSubjunctive">1️⃣2️⃣ Past Perfect Subjunctive (Pluscuamperfecto de Subjuntivo)</option>
+    </select>
+
+    <div class="top-bar">
+      <span class="badge" id="phase-badge">Phase 1: Word by Word</span>
+      <span id="streak-counter">Completed: 0</span>
+    </div>
+
+    <div class="grammar-pill" id="grammar-pill">Grammar Structure: ---</div>
+
+    <!-- Sentence Display -->
+    <div class="sentence-box" id="sentence-display">
+      <em>Type the word below to start...</em>
+    </div>
+
+    <!-- Interactive Grammar Legend -->
+    <div class="legend">
+      <div class="legend-item"><div class="dot-trigger"></div> Trigger Phrase</div>
+      <div class="legend-item"><div class="dot-verb"></div> Conjugated Verb (Hover for base)</div>
+    </div>
+
+    <!-- Challenge Card -->
+    <div class="card" id="word-card">
+      <div class="spanish-word-container" id="es-word-container">
+        <span class="spanish-word" id="es-word">---</span>
+      </div>
+      <div class="english-word" id="en-word">---</div>
+      <div class="audio-row">
+        <button class="audio-btn" onclick="speakCurrent(1.0)" tabindex="-1">🔊 Normal</button>
+        <button class="audio-btn" onclick="speakCurrent(0.65)" tabindex="-1">🐢 Slow</button>
+      </div>
+    </div>
+
+    <!-- Quick Accent Toolbar -->
+    <div class="accent-bar" id="accent-bar">
+      <button class="accent-btn" onclick="insertChar('á')" tabindex="-1">á</button>
+      <button class="accent-btn" onclick="insertChar('é')" tabindex="-1">é</button>
+      <button class="accent-btn" onclick="insertChar('í')" tabindex="-1">í</button>
+      <button class="accent-btn" onclick="insertChar('ó')" tabindex="-1">ó</button>
+      <button class="accent-btn" onclick="insertChar('ú')" tabindex="-1">ú</button>
+      <button class="accent-btn" onclick="insertChar('ñ')" tabindex="-1">ñ</button>
+      <button class="accent-btn" onclick="insertChar('¿')" tabindex="-1">¿</button>
+      <button class="accent-btn" onclick="insertChar('¡')" tabindex="-1">¡</button>
+    </div>
+
+    <!-- Typing Input -->
+    <input type="text" id="user-input" placeholder="Type in Spanish..." autocomplete="off" autocapitalize="none" spellcheck="false" autofocus>
+
+    <!-- Completion Screen -->
+    <div class="completion-screen" id="completion-screen">
+      <h2>🎉 Mastered!</h2>
+      <div id="final-sentence" style="font-size: 1.1rem; color: var(--text); line-height: 1.6; padding: 10px;"></div>
+      <p id="final-english" style="font-size: 1rem; color: var(--subtext); margin-top: -8px;"></p>
+      <button class="next-btn" onclick="generateNewSentence()">Next Sentence</button>
+      <div class="key-hint">Press <strong>[ Enter ]</strong> or <strong>[ Space ]</strong> to continue</div>
+    </div>
+
+    <!-- Session History Log -->
+    <div class="history-section" id="history-section">
+      <div class="history-header" onclick="toggleHistory()">
+        <span>📜 Completed Sentences (<span id="history-count">0</span>)</span>
+        <span id="history-toggle-icon">▼</span>
+      </div>
+      <div class="history-list" id="history-list"></div>
+    </div>
+  </div>
+
+  <script>
+    const SUBJECTS = [
+      { es: "El científico", en: "The scientist" },
+      { es: "El estudiante", en: "The student" },
+      { es: "Mi hermano", en: "My brother" },
+      { es: "El cocinero", en: "The chef" },
+      { es: "El desarrollador", en: "The developer" },
+      { es: "El deportista", en: "The athlete" },
+      { es: "El profesor", en: "The teacher" },
+      { es: "El gerente", en: "The manager" },
+      { es: "El músico", en: "The musician" },
+      { es: "El médico", en: "The doctor" }
+    ];
+
+    const PLURAL_SUBJECTS = [
+      { es: "Los científicos", en: "The scientists" },
+      { es: "Los estudiantes", en: "The students" },
+      { es: "Los ingenieros", en: "The engineers" },
+      { es: "Los viajeros", en: "The travelers" },
+      { es: "Los atletas", en: "The athletes" },
+      { es: "Los profesores", en: "The teachers" },
+      { es: "Los desarrolladores", en: "The developers" }
+    ];
+
+    const COMPLEMENTS = [
+      { es: "los datos en el laboratorio.", en: "the data in the lab." },
+      { es: "el experimento con cuidado.", en: "the experiment carefully." },
+      { es: "una nueva estrategia de trabajo.", en: "a new work strategy." },
+      { es: "el código fuente del sistema.", en: "the system source code." },
+      { es: "una cena deliciosa para el grupo.", en: "a delicious dinner for the group." },
+      { es: "el problema matemático rápidamente.", en: "the math problem quickly." },
+      { es: "el proyecto antes del plazo.", en: "the project before the deadline." },
+      { es: "la competencia internacional este año.", en: "the international competition this year." },
+      { es: "el plan de estudio para el examen.", en: "the study plan for the exam." },
+      { es: "los documentos en la oficina.", en: "the documents in the office." }
+    ];
+
+    const VERB_BASE_LIST = [
+      { base: "analizar", pres: "analiza", presPl: "analizan", fut: "analizará", futPl: "analizarán", pret: "analizó", pretPl: "analizaron", imp: "analizaba", impPl: "analizaban", cond: "analizaría", condPl: "analizarían", subj: "analice", subjPl: "analicen", impSubj: "analizara", impSubjPl: "analizaran", part: "analizado", cmd: "¡Analiza" },
+      { base: "resolver", pres: "resuelve", presPl: "resuelven", fut: "resolverá", futPl: "resolverán", pret: "resolvió", pretPl: "resolvieron", imp: "resolvía", impPl: "resolvían", cond: "resolvería", condPl: "resolverían", subj: "resuelva", subjPl: "resuelvan", impSubj: "resolviera", impSubjPl: "resolvieran", part: "resuelto", cmd: "¡Resuelve" },
+      { base: "desarrollar", pres: "desarrolla", presPl: "desarrollan", fut: "desarrollará", futPl: "desarrollarán", pret: "desarrolló", pretPl: "desarrollaron", imp: "desarrollaba", impPl: "desarrollaban", cond: "desarrollaría", condPl: "desarrollarían", subj: "desarrolle", subjPl: "desarrollen", impSubj: "desarrollara", impSubjPl: "desarrollaran", part: "desarrollado", cmd: "¡Desarrolla" },
+      { base: "organizar", pres: "organiza", presPl: "organizan", fut: "organizará", futPl: "organizarán", pret: "organizó", pretPl: "organizaron", imp: "organizaba", impPl: "organizaban", cond: "organizaría", condPl: "organizarían", subj: "organice", subjPl: "organicen", impSubj: "organizara", impSubjPl: "organizaran", part: "organizado", cmd: "¡Organiza" },
+      { base: "preparar", pres: "prepara", presPl: "preparan", fut: "preparará", futPl: "prepararán", pret: "preparó", pretPl: "prepararon", imp: "preparaba", impPl: "preparaban", cond: "prepararía", condPl: "prepararían", subj: "prepare", subjPl: "preparen", impSubj: "preparara", impSubjPl: "prepararan", part: "preparado", cmd: "¡Prepara" }
+    ];
+
+    const SUBJ_TRIGGERS = [
+      { es: "Es importante que", en: "It is important that", note: "Subjunctive Trigger (Importance)" },
+      { es: "Es necesario que", en: "It is necessary that", note: "Subjunctive Trigger (Necessity)" },
+      { es: "Dudo que", en: "I doubt that", note: "Subjunctive Trigger (Doubt)" },
+      { es: "Es probable que", en: "It is likely that", note: "Subjunctive Trigger (Probability)" },
+      { es: "Es imprescindible que", en: "It is essential that", note: "Subjunctive Trigger (Obligation)" }
+    ];
+
+    function rand(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    let currentCategory = 'all';
+    let seenSentences = new Set();
+    let currentSentence = null;
+    let currentWordIdx = 0;
+    let builtSentenceHtml = [];
+    let completedCount = 0;
+    let isFullSentencePhase = false;
+    let isCompletedScreenActive = false;
+    let historyLog = [];
+    let idleTimer = null;
+
+    const esWordContainerEl = document.getElementById('es-word-container');
+    const enWordEl = document.getElementById('en-word');
+    const inputEl = document.getElementById('user-input');
+    const sentenceDisplayEl = document.getElementById('sentence-display');
+    const wordCardEl = document.getElementById('word-card');
+    const completionScreenEl = document.getElementById('completion-screen');
+    const finalSentenceEl = document.getElementById('final-sentence');
+    const finalEnglishEl = document.getElementById('final-english');
+    const streakCounterEl = document.getElementById('streak-counter');
+    const phaseBadgeEl = document.getElementById('phase-badge');
+    const grammarPillEl = document.getElementById('grammar-pill');
+    const accentBarEl = document.getElementById('accent-bar');
+    const historyListEl = document.getElementById('history-list');
+    const historyCountEl = document.getElementById('history-count');
+
+    function changeCategory() {
+      currentCategory = document.getElementById('category-select').value;
+      generateNewSentence();
+    }
+
+    function focusInput() {
+      setTimeout(() => {
+        inputEl.focus();
+      }, 50);
+    }
+
+    function generateDynamicTenseSentence() {
+      const allTenseKeys = [
+        'present', 'future', 'command', 'presentPerfect', 
+        'presentSubjunctive', 'presentPerfectSubjunctive', 'preterite', 
+        'imperfect', 'conditional', 'pastPerfect', 
+        'imperfectSubjunctive', 'pastPerfectSubjunctive'
+      ];
+
+      let tenseKey = currentCategory === 'all' ? rand(allTenseKeys) : currentCategory;
+      const isPlural = Math.random() > 0.5;
+      const subjObj = isPlural ? rand(PLURAL_SUBJECTS) : rand(SUBJECTS);
+      const verbObj = rand(VERB_BASE_LIST);
+      const compObj = rand(COMPLEMENTS);
+      const trigObj = rand(SUBJ_TRIGGERS);
+
+      let tokens = [];
+      let fullHtml = "";
+      let fullEs = "";
+      let fullEn = "";
+      let label = "";
+
+      switch (tenseKey) {
+        case 'present':
+          label = "1. Present Tense (Presente)";
+          const presV = isPlural ? verbObj.presPl : verbObj.pres;
+          tokens = [
+            { es: subjObj.es, en: subjObj.en, type: "normal" },
+            { es: presV, en: verbObj.base, type: "verb", base: verbObj.base, indicative: presV },
+            { es: compObj.es, en: compObj.en, type: "normal" }
+          ];
+          fullEs = `${subjObj.es} ${presV} ${compObj.es}`;
+          fullEn = `${subjObj.en} ${verbObj.base}s ${compObj.en}`;
+          fullHtml = `${subjObj.es} <span class="hl-verb">${presV}<span class="tooltip">Present Indicative (Base: ${verbObj.base})</span></span> ${compObj.es}`;
+          break;
+
+        case 'future':
+          label = "2. Future Tense (Futuro Simple)";
+          const futV = isPlural ? verbObj.futPl : verbObj.fut;
+          tokens = [
+            { es: subjObj.es, en: subjObj.en, type: "normal" },
+            { es: futV, en: "will " + verbObj.base, type: "verb", base: verbObj.base, indicative: futV },
+            { es: compObj.es, en: compObj.en, type: "normal" }
+          ];
+          fullEs = `${subjObj.es} ${futV} ${compObj.es}`;
+          fullEn = `${subjObj.en} will ${verbObj.base} ${compObj.en}`;
+          fullHtml = `${subjObj.es} <span class="hl-verb">${futV}<span class="tooltip">Future Tense (Base: ${verbObj.base})</span></span> ${compObj.es}`;
+          break;
+
+        case 'command':
+          label = "3. Imperative Mood (Command)";
+          const cmdV = verbObj.cmd;
+          tokens = [
+            { es: cmdV, en: verbObj.base, type: "verb", base: verbObj.base, indicative: verbObj.pres },
+            { es: compObj.es + "!", en: compObj.en + "!", type: "normal" }
+          ];
+          fullEs = `${cmdV} ${compObj.es}!`;
+          fullEn = `${verbObj.base} ${compObj.en}!`;
+          fullHtml = `<span class="hl-verb">${cmdV}<span class="tooltip">Imperative Command (Base: ${verbObj.base})</span></span> ${compObj.es}!`;
+          break;
+
+        case 'presentPerfect':
+          label = "4. Present Perfect (Pretérito Perfecto)";
+          const hab = isPlural ? "han" : "ha";
+          tokens = [
+            { es: subjObj.es, en: subjObj.en, type: "normal" },
+            { es: hab + " " + verbObj.part, en: "has/have " + verbObj.base, type: "verb", base: verbObj.base, indicative: hab + " " + verbObj.part },
+            { es: compObj.es, en: compObj.en, type: "normal" }
+          ];
+          fullEs = `${subjObj.es} ${hab} ${verbObj.part} ${compObj.es}`;
+          fullEn = `${subjObj.en} has/have ${verbObj.base}d ${compObj.en}`;
+          fullHtml = `${subjObj.es} <span class="hl-verb">${hab} ${verbObj.part}<span class="tooltip">Present Perfect (Haber + Participle)</span></span> ${compObj.es}`;
+          break;
+
+        case 'presentSubjunctive':
+          label = "5. Present Subjunctive (Presente de Subjuntivo)";
+          const subV = isPlural ? verbObj.subjPl : verbObj.subj;
+          tokens = [
+            { es: trigObj.es, en: trigObj.en, type: "trigger", note: trigObj.note },
+            { es: subjObj.es.toLowerCase(), en: subjObj.en.toLowerCase(), type: "normal" },
+            { es: subV, en: verbObj.base, type: "verb", base: verbObj.base, indicative: verbObj.pres },
+            { es: compObj.es, en: compObj.en, type: "normal" }
+          ];
+          fullEs = `${trigObj.es} ${subjObj.es.toLowerCase()} ${subV} ${compObj.es}`;
+          fullEn = `${trigObj.en} ${subjObj.en.toLowerCase()} ${verbObj.base}s ${compObj.en}`;
+          fullHtml = `<span class="hl-trigger">${trigObj.es}<span class="tooltip">${trigObj.note}</span></span> ${subjObj.es.toLowerCase()} <span class="hl-verb">${subV}<span class="tooltip">Subjunctive (Base: ${verbObj.base})</span></span> ${compObj.es}`;
+          break;
+
+        case 'presentPerfectSubjunctive':
+          label = "6. Present Perfect Subjunctive";
+          const hayaV = isPlural ? "hayan" : "haya";
+          tokens = [
+            { es: trigObj.es, en: trigObj.en, type: "trigger", note: trigObj.note },
+            { es: subjObj.es.toLowerCase(), en: subjObj.en.toLowerCase(), type: "normal" },
+            { es: hayaV + " " + verbObj.part, en: "has/have " + verbObj.base, type: "verb", base: verbObj.base, indicative: "ha " + verbObj.part },
+            { es: compObj.es, en: compObj.en, type: "normal" }
+          ];
+          fullEs = `${trigObj.es} ${subjObj.es.toLowerCase()} ${hayaV} ${verbObj.part} ${compObj.es}`;
+          fullEn = `${trigObj.en} ${subjObj.en.toLowerCase()} has/have ${verbObj.base}d ${compObj.en}`;
+          fullHtml = `<span class="hl-trigger">${trigObj.es}<span class="tooltip">${trigObj.note}</span></span> ${subjObj.es.toLowerCase()} <span class="hl-verb">${hayaV} ${verbObj.part}<span class="tooltip">Present Perfect Subjunctive</span></span> ${compObj.es}`;
+          break;
+
+        case 'preterite':
+          label = "7. Preterite Tense (Pretérito Indefinido)";
+          const pretV = isPlural ? verbObj.pretPl : verbObj.pret;
+          tokens = [
+            { es: "Ayer", en: "Yesterday", type: "normal" },
+            { es: subjObj.es.toLowerCase(), en: subjObj.en.toLowerCase(), type: "normal" },
+            { es: pretV, en: verbObj.base + "d", type: "verb", base: verbObj.base, indicative: pretV },
+            { es: compObj.es, en: compObj.en, type: "normal" }
+          ];
+          fullEs = `Ayer ${subjObj.es.toLowerCase()} ${pretV} ${compObj.es}`;
+          fullEn = `Yesterday ${subjObj.en.toLowerCase()} ${verbObj.base}d ${compObj.en}`;
+          fullHtml = `Ayer ${subjObj.es.toLowerCase()} <span class="hl-verb">${pretV}<span class="tooltip">Preterite Tense (Completed Past)</span></span> ${compObj.es}`;
+          break;
+
+        case 'imperfect':
+          label = "8. Imperfect Tense (Pretérito Imperfecto)";
+          const impV = isPlural ? verbObj.impPl : verbObj.imp;
+          tokens = [
+            { es: "Antes", en: "Before", type: "normal" },
+            { es: subjObj.es.toLowerCase(), en: subjObj.en.toLowerCase(), type: "normal" },
+            { es: impV, en: "used to " + verbObj.base, type: "verb", base: verbObj.base, indicative: impV },
+            { es: compObj.es, en: compObj.en, type: "normal" }
+          ];
+          fullEs = `Antes ${subjObj.es.toLowerCase()} ${impV} ${compObj.es}`;
+          fullEn = `Before ${subjObj.en.toLowerCase()} used to ${verbObj.base} ${compObj.en}`;
+          fullHtml = `Antes ${subjObj.es.toLowerCase()} <span class="hl-verb">${impV}<span class="tooltip">Imperfect Tense (Habitual Action)</span></span> ${compObj.es}`;
+          break;
+
+        case 'conditional':
+          label = "9. Conditional Tense (Condicional Simple)";
+          const condV = isPlural ? verbObj.condPl : verbObj.cond;
+          tokens = [
+            { es: "Con más tiempo,", en: "With more time,", type: "normal" },
+            { es: subjObj.es.toLowerCase(), en: subjObj.en.toLowerCase(), type: "normal" },
+            { es: condV, en: "would " + verbObj.base, type: "verb", base: verbObj.base, indicative: verbObj.pres },
+            { es: compObj.es, en: compObj.en, type: "normal" }
+          ];
+          fullEs = `Con más tiempo, ${subjObj.es.toLowerCase()} ${condV} ${compObj.es}`;
+          fullEn = `With more time, ${subjObj.en.toLowerCase()} would ${verbObj.base} ${compObj.en}`;
+          fullHtml = `Con más tiempo, ${subjObj.es.toLowerCase()} <span class="hl-verb">${condV}<span class="tooltip">Conditional Tense (Base: ${verbObj.base})</span></span> ${compObj.es}`;
+          break;
+
+        case 'pastPerfect':
+          label = "10. Past Perfect / Pluperfect (Pluscuamperfecto)";
+          const habiaV = isPlural ? "habían" : "había";
+          tokens = [
+            { es: "Ya", en: "Already", type: "normal" },
+            { es: subjObj.es.toLowerCase(), en: subjObj.en.toLowerCase(), type: "normal" },
+            { es: habiaV + " " + verbObj.part, en: "had " + verbObj.base, type: "verb", base: verbObj.base, indicative: habiaV + " " + verbObj.part },
+            { es: compObj.es, en: compObj.en, type: "normal" }
+          ];
+          fullEs = `Ya ${subjObj.es.toLowerCase()} ${habiaV} ${verbObj.part} ${compObj.es}`;
+          fullEn = `Already ${subjObj.en.toLowerCase()} had ${verbObj.base}d ${compObj.en}`;
+          fullHtml = `Ya ${subjObj.es.toLowerCase()} <span class="hl-verb">${habiaV} ${verbObj.part}<span class="tooltip">Pluperfect Indicative</span></span> ${compObj.es}`;
+          break;
+
+        case 'imperfectSubjunctive':
+          label = "11. Imperfect Subjunctive (Imperfecto de Subjuntivo)";
+          const impSubV = isPlural ? verbObj.impSubjPl : verbObj.impSubj;
+          const resCond = isPlural ? verbObj.condPl : verbObj.cond;
+          tokens = [
+            { es: "Si", en: "If", type: "trigger", note: "Past Subjunctive Condition" },
+            { es: subjObj.es.toLowerCase(), en: subjObj.en.toLowerCase(), type: "normal" },
+            { es: impSubV, en: "had " + verbObj.base, type: "verb", base: verbObj.base, indicative: verbObj.pres },
+            { es: compObj.es.replace('.', ','), en: compObj.en.replace('.', ','), type: "normal" },
+            { es: resCond, en: "would " + verbObj.base, type: "verb", base: verbObj.base, indicative: verbObj.pres },
+            { es: "todo rápidamente.", en: "everything quickly.", type: "normal" }
+          ];
+          fullEs = `Si ${subjObj.es.toLowerCase()} ${impSubV} ${compObj.es.replace('.', ',')} ${resCond} todo rápidamente.`;
+          fullEn = `If ${subjObj.en.toLowerCase()} ${verbObj.base}d ${compObj.en.replace('.', ',')} would ${verbObj.base} everything quickly.`;
+          fullHtml = `<span class="hl-trigger">Si<span class="tooltip">Past Subjunctive Trigger</span></span> ${subjObj.es.toLowerCase()} <span class="hl-verb">${impSubV}<span class="tooltip">Imperfect Subjunctive</span></span> ${compObj.es.replace('.', ',')} <span class="hl-verb">${resCond}<span class="tooltip">Conditional Tense</span></span> todo rápidamente.`;
+          break;
+
+        case 'pastPerfectSubjunctive':
+          label = "12. Past Perfect Subjunctive (Pluscuamperfecto de Subjuntivo)";
+          const hubieraV = isPlural ? "hubieran" : "hubiera";
+          const habriaV = isPlural ? "habrían" : "habría";
+          tokens = [
+            { es: "Si", en: "If", type: "trigger", note: "Pluperfect Subjunctive" },
+            { es: subjObj.es.toLowerCase(), en: subjObj.en.toLowerCase(), type: "normal" },
+            { es: hubieraV + " " + verbObj.part, en: "had " + verbObj.base, type: "verb", base: verbObj.base, indicative: "había " + verbObj.part },
+            { es: compObj.es.replace('.', ','), en: compObj.en.replace('.', ','), type: "normal" },
+            { es: habriaV + " " + verbObj.part, en: "would have " + verbObj.base, type: "verb", base: verbObj.base, indicative: "había " + verbObj.part },
+            { es: "el proyecto.", en: "the project.", type: "normal" }
+          ];
+          fullEs = `Si ${subjObj.es.toLowerCase()} ${hubieraV} ${verbObj.part} ${compObj.es.replace('.', ',')} ${habriaV} ${verbObj.part} el proyecto.`;
+          fullEn = `If ${subjObj.en.toLowerCase()} had ${verbObj.base}d ${compObj.en.replace('.', ',')} would have ${verbObj.base}d the project.`;
+          fullHtml = `<span class="hl-trigger">Si<span class="tooltip">Pluperfect Subjunctive Trigger</span></span> ${subjObj.es.toLowerCase()} <span class="hl-verb">${hubieraV} ${verbObj.part}<span class="tooltip">Pluperfect Subjunctive</span></span> ${compObj.es.replace('.', ',')} <span class="hl-verb">${habriaV} ${verbObj.part}<span class="tooltip">Compound Conditional</span></span> el proyecto.`;
+          break;
+      }
+
+      const spanishTokens = [];
+      const englishTokens = [];
+
+      tokens.forEach(part => {
+        const esWords = part.es.split(" ");
+        esWords.forEach((word, idx) => {
+          spanishTokens.push({
+            word: word,
+            type: part.type,
+            base: part.base,
+            indicative: part.indicative,
+            note: part.note
+          });
+          englishTokens.push(idx === 0 ? part.en : "");
+        });
+      });
+
+      return {
+        spanishTokens,
+        englishTokens,
+        fullSpanish: fullEs,
+        fullEsHtml: fullHtml,
+        fullEnglish: fullEn,
+        grammar: label
+      };
+    }
+
+    function speakText(text, rate = 0.82) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'es-ES';
+        utterance.rate = rate;
+        window.speechSynthesis.speak(utterance);
+      }
+    }
+
+    function speakCurrent(rate = 0.82) {
+      if (!isFullSentencePhase) {
+        if (currentWordIdx < currentSentence.spanishTokens.length) {
+          speakText(currentSentence.spanishTokens[currentWordIdx].word, rate);
+        }
+      } else {
+        speakText(currentSentence.fullSpanish, rate);
+      }
+    }
+
+    function insertChar(char) {
+      const start = inputEl.selectionStart;
+      const end = inputEl.selectionEnd;
+      const text = inputEl.value;
+      inputEl.value = text.substring(0, start) + char + text.substring(end);
+      focusInput();
+      inputEl.setSelectionRange(start + 1, start + 1);
+      inputEl.dispatchEvent(new Event('input'));
+    }
+
+    function renderTokenCard(tokenObj, englishMeaning) {
+      if (tokenObj.type === "verb") {
+        esWordContainerEl.innerHTML = `
+          <span class="spanish-word hl-verb">
+            ${tokenObj.word}
+            <span class="tooltip">Infinitive: ${tokenObj.base} | Indicative: ${tokenObj.indicative}</span>
+          </span>`;
+      } else if (tokenObj.type === "trigger") {
+        esWordContainerEl.innerHTML = `
+          <span class="spanish-word hl-trigger">
+            ${tokenObj.word}
+            <span class="tooltip">${tokenObj.note || 'Grammar Trigger'}</span>
+          </span>`;
+      } else {
+        esWordContainerEl.innerHTML = `<span class="spanish-word">${tokenObj.word}</span>`;
+      }
+      enWordEl.textContent = englishMeaning || '';
+    }
+
+    function updateCard() {
+      if (!isFullSentencePhase) {
+        if (currentWordIdx < currentSentence.spanishTokens.length) {
+          const currentObj = currentSentence.spanishTokens[currentWordIdx];
+          renderTokenCard(currentObj, currentSentence.englishTokens[currentWordIdx]);
+          inputEl.value = '';
+          inputEl.classList.remove('correct', 'typo-highlight');
+          speakCurrent();
+          focusInput();
+        } else {
+          startFullSentencePhase();
+        }
+      } else {
+        const targetClean = cleanText(currentSentence.fullSpanish);
+        const userClean = cleanText(inputEl.value);
+
+        if (userClean === targetClean) {
+          clearTimeout(idleTimer);
+          inputEl.classList.remove('typo-highlight');
+          inputEl.classList.add('correct');
+          
+          setTimeout(() => {
+            completedCount++;
+            streakCounterEl.textContent = `Completed: ${completedCount}`;
+            
+            addToHistory(currentSentence);
+
+            wordCardEl.style.display = 'none';
+            inputEl.style.display = 'none';
+            accentBarEl.style.display = 'none';
+            completionScreenEl.style.display = 'flex';
+            isCompletedScreenActive = true;
+            
+            finalSentenceEl.innerHTML = currentSentence.fullEsHtml;
+            finalEnglishEl.textContent = `"${currentSentence.fullEnglish}"`;
+            
+            speakText(currentSentence.fullSpanish);
+          }, 400);
+        }
+      }
+    }
+
+    function addToHistory(sentenceObj) {
+      historyLog.unshift(sentenceObj);
+      historyCountEl.textContent = historyLog.length;
+
+      const itemHtml = `
+        <div class="history-item">
+          <div>${sentenceObj.fullEsHtml}</div>
+          <div class="history-item-en">"${sentenceObj.fullEnglish}"</div>
+        </div>`;
+      
+      historyListEl.insertAdjacentHTML('afterbegin', itemHtml);
+    }
+
+    function toggleHistory() {
+      const isHidden = historyListEl.style.display === 'none';
+      historyListEl.style.display = isHidden ? 'flex' : 'none';
+      document.getElementById('history-toggle-icon').textContent = isHidden ? '▼' : '▲';
+    }
+
+    function startFullSentencePhase() {
+      isFullSentencePhase = true;
+      phaseBadgeEl.textContent = "Phase 2: Full Sentence Practice";
+      phaseBadgeEl.style.background = "rgba(245, 158, 11, 0.2)";
+      phaseBadgeEl.style.color = "var(--warning)";
+
+      sentenceDisplayEl.innerHTML = `<em>Type the complete Spanish sentence below:</em>`;
+      esWordContainerEl.innerHTML = `<div style="font-size:1.1rem; padding: 6px;" id="target-sentence-html">${currentSentence.fullEsHtml}</div>`;
+      enWordEl.textContent = `"${currentSentence.fullEnglish}"`;
+      
+      inputEl.value = '';
+      inputEl.placeholder = "Type full sentence here...";
+      inputEl.classList.remove('correct', 'typo-highlight');
+      
+      speakText(currentSentence.fullSpanish);
+      focusInput();
+      resetIdleTimer();
+    }
+
+    function resetIdleTimer() {
+      clearTimeout(idleTimer);
+      inputEl.classList.remove('typo-highlight');
+
+      if (isFullSentencePhase && !isCompletedScreenActive) {
+        // Reset displayed sentence HTML to normal when user resumes typing
+        const targetContainer = document.getElementById('target-sentence-html');
+        if (targetContainer) {
+          targetContainer.innerHTML = currentSentence.fullEsHtml;
+        }
+
+        idleTimer = setTimeout(() => {
+          // Trigger after 5 seconds of inactivity:
+          const userVal = inputEl.value.trim();
+          if (userVal.length > 0 && targetContainer) {
+            const targetWords = currentSentence.fullSpanish.split(' ');
+            const userWords = userVal.split(' ');
+            let hasTypos = false;
+
+            let highlightedWords = targetWords.map((word, idx) => {
+              if (idx < userWords.length) {
+                if (cleanText(userWords[idx]) !== cleanText(word)) {
+                  hasTypos = true;
+                  // Straight red line under misspelled target words
+                  return `<span class="typo-word">${word}</span>`;
+                }
+              }
+              return word;
+            });
+
+            targetContainer.innerHTML = highlightedWords.join(' ');
+
+            // Turn input box red if typos are detected
+            if (hasTypos) {
+              inputEl.classList.add('typo-highlight');
+            }
+          }
+        }, 5000);
+      }
+    }
+
+    function cleanText(str) {
+      return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^\w]/g, "");
+    }
+
+    inputEl.addEventListener('input', (e) => {
+      resetIdleTimer();
+
+      if (!isFullSentencePhase) {
+        const targetObj = currentSentence.spanishTokens[currentWordIdx];
+        if (cleanText(e.target.value) === cleanText(targetObj.word)) {
+          inputEl.classList.add('correct');
+          
+          let styledWord = targetObj.word;
+          if (targetObj.type === "trigger") {
+            styledWord = `<span class="hl-trigger">${targetObj.word}<span class="tooltip">${targetObj.note}</span></span>`;
+          } else if (targetObj.type === "verb") {
+            styledWord = `<span class="hl-verb">${targetObj.word}<span class="tooltip">${targetObj.base} → ${targetObj.indicative}</span></span>`;
+          }
+          
+          builtSentenceHtml.push(styledWord);
+          sentenceDisplayEl.innerHTML = builtSentenceHtml.join(' ');
+
+          setTimeout(() => {
+            currentWordIdx++;
+            updateCard();
+          }, 250);
+        }
+      } else {
+        updateCard();
+      }
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (isCompletedScreenActive && (e.key === 'Enter' || e.key === ' ')) {
+        e.preventDefault();
+        generateNewSentence();
+        return;
+      }
+
+      if (document.activeElement !== inputEl && e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey) {
+        focusInput();
+      }
+    });
+
+    function generateNewSentence() {
+      clearTimeout(idleTimer);
+      isCompletedScreenActive = false;
+
+      let candidate;
+      let attempts = 0;
+      do {
+        candidate = generateDynamicTenseSentence();
+        attempts++;
+      } while (seenSentences.has(candidate.fullSpanish) && attempts < 100);
+
+      seenSentences.add(candidate.fullSpanish);
+      currentSentence = candidate;
+
+      currentWordIdx = 0;
+      builtSentenceHtml = [];
+      isFullSentencePhase = false;
+
+      grammarPillEl.textContent = `Grammar: ${currentSentence.grammar}`;
+
+      phaseBadgeEl.textContent = "Phase 1: Word by Word";
+      phaseBadgeEl.style.background = "rgba(56, 189, 248, 0.2)";
+      phaseBadgeEl.style.color = "var(--accent)";
+      
+      sentenceDisplayEl.innerHTML = '<em>Type the word below to start...</em>';
+      inputEl.placeholder = "Type in Spanish...";
+      inputEl.classList.remove('typo-highlight');
+      wordCardEl.style.display = 'flex';
+      inputEl.style.display = 'block';
+      accentBarEl.style.display = 'flex';
+      completionScreenEl.style.display = 'none';
+
+      updateCard();
+      focusInput();
+    }
+
+    document.body.addEventListener('click', function initAudio() {
+      speakCurrent();
+      document.body.removeEventListener('click', initAudio);
+    }, { once: true });
+
+    generateNewSentence();
+  </script>
+</body>
+</html>
